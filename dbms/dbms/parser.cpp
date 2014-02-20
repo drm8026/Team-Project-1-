@@ -258,17 +258,8 @@ table parser::atomic_expr() {
 		default:
 			keep_going = 0;
 			break;
-
-
-
 		}
-
-
-
 	}
-
-
-
 }
 //any combination of tables combinations
 table parser::expr() {
@@ -882,13 +873,12 @@ void parser::evaluate_statement(database& db){
 				//write_cmd();
 			}
 			else if (key_word == "OPEN") {
-				open_cmd();
+				//open_cmd();
 			}
 			else if (key_word == "INSERTINTO") {
 				insert_obj io = insert_cmd();
 				db.get_table(io.name).insert(io.values);
 				t = ts.get();
-
 			}
 			break;
 		case '9':
@@ -900,12 +890,20 @@ void parser::evaluate_statement(database& db){
 			t = ts.get();
 			if (t.kind == '-') {
 				operation_or_name = identifier();
-				if (operation_or_name == "select") { //select
+				if (operation_or_name == "select") {
 					query_view = selection_qry();
 					query_view.set_name(new_view);
 					db.add_table(query_view);
 				}
-				else { //project, union, etc
+				else if (operation_or_name == "project") {
+
+
+				}
+				else if (operation_or_name == "rename") {
+
+				}
+				else { //first token will be a table name or atomic expr
+
 
 				}
 			}
