@@ -1,10 +1,8 @@
 #include "database.h"
 #include <algorithm>
-table database::set_union(string view_name, string table_one_name, string table_two_name)		//: compute the union of two relations; the relations must be union-compatible.
+table database::set_union(string view_name, table t1, table t2)		//: compute the union of two relations; the relations must be union-compatible.
 {
 	table union_table;		//the final table view
-	table t1 = tables[find_table(table_one_name)];		//get a handle on both tables by their passed name arguments
-	table t2 = tables[find_table(table_two_name)];
 	union_table = t1;
 
 	int can_push = 0;
@@ -25,12 +23,9 @@ table database::set_union(string view_name, string table_one_name, string table_
 	union_table.set_name(view_name);
 	return union_table;
 }
-table database::set_difference(string view_name, string table_one_name, string table_two_name)	//: compute the set difference of two relations; the relations must be union-compatible.
+table database::set_difference(string view_name, table t1, table t2)	//: compute the set difference of two relations; the relations must be union-compatible.
 {
 	//defining tables
-	
-	table t1 = tables[find_table(table_one_name)];
-	table t2 = tables[find_table(table_two_name)];
 	table diff_table(view_name, t1.attribute_names,t1.primary_key);
 	int check=0;
 	
@@ -76,43 +71,38 @@ table database::set_selection(string view_name, table tble, condition_obj condit
 	}
 	return sel_table;
 }
-table database::set_projection(string view_name, string table_name, vector<string> attributes)	//: select a subset of the attributes in a relation.
+table database::set_projection(string view_name, table tble, vector<string> attributes)	//: select a subset of the attributes in a relation.
 {
-	table t1 = tables[find_table(table_name)];
-	table proj_table(view_name, attributes,t1.primary_key);
+	table proj_table(view_name, attributes, tble.primary_key);
 	vector<string> tuple;
-	for(int i = 0; i< t1.entity_table.size(); i++){		//go through the whole entity table
-		for(int j = 0; j < t1.attribute_names.size(); j++){	//go through all the attributes
+	for(int i = 0; i< tble.entity_table.size(); i++){		//go through the whole entity table
+		for (int j = 0; j < tble.attribute_names.size(); j++){	//go through all the attributes
 			for(int k = 0; k<attributes.size(); k++)
-				if(t1.attribute_names[j]==attributes[k])
-					tuple.push_back(t1.entity_table[i].get_attribute(t1.attribute_names[j]));
+				if (tble.attribute_names[j] == attributes[k])
+					tuple.push_back(tble.entity_table[i].get_attribute(tble.attribute_names[j]));
 		}
 		proj_table.insert(tuple);
 		tuple.clear();
-	}
-	
+	}	
 	return proj_table;
 }
-table database::set_renaming(string view_name, string table_name, vector<string> attributes)	//: rename the attributes in a relation.
+table database::set_renaming(string view_name, table tble, vector<string> attributes)	//: rename the attributes in a relation.
 {
-	table t1 = tables[find_table(table_name)];
+	table ren_table(view_name, attributes, tble.primary_key);
+	for (int i = 0; i < ren_table.entity_table.size(); i++)
+		for (int j = 0; j < ren_table.attribute_names.size(); j++)
+			ren_table.entity_table[i].set_attribute(attributes[j], ren_table.entity_table[i].get_attribute(ren_table.attribute_names[j]));
 	
-	for(int i = 0; i < t1.entity_table.size(); i++)
-		for(int j = 0; j < t1.attribute_names.size(); j++)
-			t1.entity_table[i].set_attribute(attributes[j],t1.entity_table[i].get_attribute(t1.attribute_names[j]));
-	
-	for(int i = 0; i < t1.attribute_names.size(); i++){		//go through all attributes
-		t1.attribute_names[i] = attributes[i];
+	for (int i = 0; i < ren_table.attribute_names.size(); i++){		//go through all attributes
+		ren_table.attribute_names[i] = attributes[i];
 	}
-	t1.set_name(view_name);
-	return t1;
+	ren_table.set_name(view_name);
+	return ren_table;
 }
-table database::set_cross_product(string view_name, string table_one_name, string table_two_name)//: compute the Cartesian product of two relations.
+table database::set_cross_product(string view_name, table t1, table t2)//: compute the Cartesian product of two relations.
 {
 	//defining tables
 	table cp_table;
-	table t1 = tables[find_table(table_one_name)];
-	table t2 = tables[find_table(table_two_name)];
 	
 	//defining starting
 	vector<string> attr_names;
@@ -149,12 +139,10 @@ table database::set_cross_product(string view_name, string table_one_name, strin
 	cp_table.set_name(view_name);
 	return cp_table;
 }
-table database::set_natural_join(string view_name, string table_one_name, string table_two_name)
+table database::set_natural_join(string view_name, table t1, table t2)
 {
 	//defining tables
 	table nj_table;
-	table t1 = tables[find_table(table_one_name)];
-	table t2 = tables[find_table(table_two_name)];
 	
 	//define attribute names as t1's they must be union compatable
 	vector<string> attr_names;

@@ -128,7 +128,7 @@ bool do_comparison(string oper1, string op, string oper2) {
 	}
 	else if (op == "<=") {
 		if (integer_op_flag) {
-			if (d_oper1 < d_oper2) {
+			if (d_oper1 <= d_oper2) {
 				return true;
 			}
 			else {
@@ -141,7 +141,7 @@ bool do_comparison(string oper1, string op, string oper2) {
 	}
 	else if (op == ">") {
 		if (integer_op_flag) {
-			if (d_oper1 < d_oper2) {
+			if (d_oper1 > d_oper2) {
 				return true;
 			}
 			else {
@@ -154,7 +154,7 @@ bool do_comparison(string oper1, string op, string oper2) {
 	}
 	else if (op == ">=") {
 		if (integer_op_flag) {
-			if (d_oper1 < d_oper2) {
+			if (d_oper1 >= d_oper2) {
 				return true;
 			}
 			else {
@@ -167,7 +167,7 @@ bool do_comparison(string oper1, string op, string oper2) {
 	}
 	else if (op == "==") {
 		if (integer_op_flag) {
-			if (d_oper1 < d_oper2) {
+			if (d_oper1 == d_oper2) {
 				return true;
 			}
 			else {
@@ -180,7 +180,7 @@ bool do_comparison(string oper1, string op, string oper2) {
 	}
 	else if (op == "!=") {
 		if (integer_op_flag) {
-			if (d_oper1 < d_oper2) {
+			if (d_oper1 != d_oper2) {
 				return true;
 			}
 			else {

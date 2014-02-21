@@ -240,7 +240,7 @@ string parser::relation_name() {
 string parser::attribute_name() {
 	return identifier();
 }
-// relation name or an expressoin
+// relation name or an expression
 table parser::atomic_expr() {
 	Token t = ts.get();
 	int keep_going = 1;
@@ -283,7 +283,8 @@ table parser::expr() {
 		return selection_qry();
 	}
 	else if (result == "projection") {
-
+		ts.putback(t);
+		return projection_qry();
 	}
 	else if (result == "renaming") {
 
@@ -416,16 +417,8 @@ vector<string> parser::literal_list() {
 			list.push_back(to_string(t.value));
 		case ')':
 			return list;
-
-
-
-
 		}
-
-
 	}
-
-
 }
 //command used to insert into a database
 insert_obj parser::insert_cmd()  {
@@ -619,7 +612,7 @@ table parser::selection_qry() {
 	Token t = ts.get();
 	condition_obj condits;
 	table to_return;
-	string name;
+	string view_name;
 	int keep_going = 1;
 	while (keep_going) {
 		switch (t.kind) {
@@ -628,8 +621,7 @@ table parser::selection_qry() {
 			if (num_of_parentheses < 2) {
 				condits = condition();
 			}
-			else {
-				
+			else {			
 				to_return = expr();
 			}
 			t = ts.get();
@@ -637,66 +629,85 @@ table parser::selection_qry() {
 		case ')':
 			to_return = atomic_expr();
 			t = ts.get();
-			if (t.kind = ';') {
+			if (t.kind == ';') {
 				break;
 			}
 			else {
 				t = ts.get();
+				ts.putback(t);
 			}			
 			break;
 		case ';':
-			//ts.putback(t);
-			return db_ptr->set_selection(name, to_return, condits);
+			return db_ptr->set_selection(view_name, to_return, condits);
 			keep_going = 0;
 		}
-
-
 	}
-
-
-
 }
-//a request to perform a manipulation on a table
-void parser::query() {
+
+table parser::projection_qry() {
+	int num_of_parentheses = 0;
 	Token t = ts.get();
+	vector<string> attr_list;
+	table to_return;
+	string view_name;
 	int keep_going = 1;
-	string name;
-	string which_query;
+	while (keep_going) {
+		switch (t.kind) {
+		case '(':
+			num_of_parentheses++;
+			if (num_of_parentheses < 2) {
+				attr_list = attribute_list();
+			}
+			t = ts.get();
+			break;
+		case ')':
+			to_return = atomic_expr();
+			t = ts.get();
+			if (t.kind == ';') {
+				break;
+			}
+			else {
+				t = ts.get();
+			}
+			break;
+		case ';':
+			return db_ptr->set_projection(view_name, to_return, attr_list);
+			keep_going = 0;
+		}
+	}
+}
+
+table parser::union_qry() {
+	Token t = ts.get();
+	table left, right;
+	int assign_right = 0;
+	string view_name;
+	int keep_going = 1;
 	while (keep_going) {
 		switch (t.kind) {
 		case '9':
 			ts.putback(t);
-			name = relation_name();
-			t = ts.get();
-			break;
-		case '<':
-			t = ts.get();
-			if (t.kind == '-') {
-				which_query = identifier();
-				keep_going = 0;
+			if (assign_right == 0) {
+				left = atomic_expr();
+				assign_right += 1;
+			}
+			else if (assign_right == 1) {
+				right = atomic_expr();
 			}			
+			t = ts.get();
 			break;
-		default:
+		case '+':
+			right = atomic_expr();
+			t = ts.get();
 			break;
+		case ';':
+			return db_ptr->set_union(view_name, left, right);
 		}
 	}
-
-	if (which_query == "select") {
-		//selection_qry();
-		;
-	}
-
-
 }
 
 
-
-
-
-
-
-
-
+//a request to perform a manipulation on a table
 
 
 
@@ -896,15 +907,30 @@ void parser::evaluate_statement(database& db){
 					db.add_table(query_view);
 				}
 				else if (operation_or_name == "project") {
-
-
+					query_view = projection_qry();
+					query_view.set_name(new_view);
+					db.add_table(query_view);
 				}
 				else if (operation_or_name == "rename") {
 
 				}
 				else { //first token will be a table name or atomic expr
+					ts.get();
+
+					//put operation_or_name back on the front of cin buffer
+					char *put_first;
+					put_first = new char[operation_or_name.size() + 1];
+					strncpy_s(put_first, operation_or_name.size()+1, operation_or_name.c_str(), operation_or_name.size());
+
+					int where_to_insert = new_view.size() + 4;
+					cin.rdbuf()->pubseekpos(where_to_insert);
+					cin.rdbuf()->sputn(put_first, sizeof(put_first));
 
 
+					
+					query_view = union_qry();
+					query_view.set_name(new_view);
+					db.add_table(query_view);
 				}
 			}
 			break;

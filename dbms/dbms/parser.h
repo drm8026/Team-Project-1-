@@ -9,6 +9,8 @@
 #include "update_obj.h"
 #include "insert_obj.h"
 #include "delete_obj.h"
+#include <sstream>
+#include <istream>
 
 using namespace std;
 class parser {

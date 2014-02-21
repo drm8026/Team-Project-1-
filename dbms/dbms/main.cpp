@@ -28,7 +28,7 @@ int main()
 	//p.query();
 
 	stringstream eval_input;
-	eval_input << "CREATE TABLE animals (name VARCHAR(20), kind VARCHAR(8), years INTEGER) PRIMARY KEY (name, kind);";
+	eval_input << "CREATE TABLE animals (name VARCHAR(20), kind VARCHAR(8), years INTEGER) PRIMARY KEY (name, kind);\n";
 	cin.rdbuf(eval_input.rdbuf());
 
 	p.evaluate_statement(db);
@@ -91,6 +91,13 @@ int main()
 
 	eval_input.clear();
 	eval_input.str(string());
+	eval_input << "olddogs <- select (kind == \"dog\") (select (years > 5) animals);";
+	cin.rdbuf(eval_input.rdbuf());
+
+	p.evaluate_statement(db);
+
+	eval_input.clear();
+	eval_input.str(string());
 	eval_input << "youngdogs <- select (kind == \"dog\") (select (years < 5) animals);";
 	cin.rdbuf(eval_input.rdbuf());
 
@@ -98,7 +105,21 @@ int main()
 
 	eval_input.clear();
 	eval_input.str(string());
-	eval_input << "SHOW youngdogs;";
+	eval_input << "SHOW olddogs;";
+	cin.rdbuf(eval_input.rdbuf());
+
+	p.evaluate_statement(db);
+
+	eval_input.clear();
+	eval_input.str(string());
+	eval_input << "uniontest <- olddogs + youngdogs;";
+	cin.rdbuf(eval_input.rdbuf());
+
+	p.evaluate_statement(db);
+
+	eval_input.clear();
+	eval_input.str(string());
+	eval_input << "SHOW uniontest;";
 	cin.rdbuf(eval_input.rdbuf());
 
 	p.evaluate_statement(db);
