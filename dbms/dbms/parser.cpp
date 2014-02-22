@@ -282,7 +282,7 @@ table parser::expr() {
 		ts.putback(t);
 		return selection_qry();
 	}
-	else if (result == "projection") {
+	else if (result == "project") {
 		ts.putback(t);
 		return projection_qry();
 	}
