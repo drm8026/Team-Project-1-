@@ -691,7 +691,7 @@ table parser::tables_qry() {
 			right = atomic_expr();
 			t = ts.get();
 			break;
-		case ';':
+		case ';': case ')':
 			switch (op) {
 			case '+':
 				return db_ptr->set_union(view_name, left, right);
@@ -850,15 +850,17 @@ void parser::evaluate_statement(database& db){
 	ts.putback(t);
 	int keep_going = 1;
 	table query_view;
-	string key_word = keyword();
+	string key_word;
 	string new_view;
 	string operation_or_name;
 	while (keep_going) {
 		switch (t.kind) {
 		case '7':
+			ts.putback(t);
+			key_word = keyword();
 			if (key_word == "SHOW") {
 				db.get_table(show_cmd()).display_table();
-				keep_going = 0;
+				t = ts.get();
 			}
 			else if (key_word == "DELETEFROM") {
 				del_obj = delete_cmd();
@@ -929,9 +931,14 @@ void parser::evaluate_statement(database& db){
 				}
 			}
 			break;
-		default:
+		case '0':
 			keep_going = 0;
 			break;
+		default:
+			t = ts.get();
+			break;
+		
+
 		}
 	}
 

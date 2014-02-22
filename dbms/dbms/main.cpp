@@ -19,76 +19,57 @@ int main()
 {
 	database db;
 	parser p;
-	//p.show_cmd();
-	//p.update_cmd();
-
-	stringstream query_input;
-	query_input << "high_hit_pirates <- select (team == \"pirates\") (select (homeruns >= 40) baseball_players);";
-	//cin.rdbuf(query_input.rdbuf());
-	//p.query();
 
 	stringstream eval_input;
-	eval_input << "CREATE TABLE animals (name VARCHAR(20), kind VARCHAR(8), years INTEGER) PRIMARY KEY (name, kind);\n";
+	eval_input <<	"CREATE TABLE cats (name VARCHAR(20), kind VARCHAR(8), years INTEGER) PRIMARY KEY (name, kind);\n" <<
+					"INSERT INTO cats VALUES FROM(\"joe\", \"cat\", 4);\n" <<
+					"INSERT INTO cats VALUES FROM (\"tabitha\", \"cat\", 1);\n";
+	cin.rdbuf(eval_input.rdbuf());
+
+	p.evaluate_statement(db);
+
+	eval_input <<	"CREATE TABLE dogs (name VARCHAR(20), kind VARCHAR(8), years INTEGER) PRIMARY KEY (name, kind);\n" <<
+					"INSERT INTO dogs VALUES FROM (\"spot\", \"dog\", 10);\n" <<
+					"INSERT INTO dogs VALUES FROM (\"snoopy\", \"dog\", 3);\n";
 	cin.rdbuf(eval_input.rdbuf());
 
 	p.evaluate_statement(db);
 
 	eval_input.clear();
 	eval_input.str(string());
-	eval_input << "INSERT INTO animals VALUES FROM(\"joe\", \"cat\", 4);";
+	eval_input <<	"SHOW cats;" <<
+					"SHOW dogs;";
 	cin.rdbuf(eval_input.rdbuf());
 
 	p.evaluate_statement(db);
-
+	/*
 	eval_input.clear();
 	eval_input.str(string());
-	eval_input << "INSERT INTO animals VALUES FROM (\"spot\", \"dog\", 10);";
-	cin.rdbuf(eval_input.rdbuf());
-
-	p.evaluate_statement(db);
-	eval_input.clear();
-	eval_input.str(string());
-	eval_input << "INSERT INTO animals VALUES FROM (\"snoopy\", \"dog\", 3);";
-	cin.rdbuf(eval_input.rdbuf());
-
-	p.evaluate_statement(db);
-	eval_input.clear();
-	eval_input.str(string());
-	eval_input << "INSERT INTO animals VALUES FROM (\"tweety\", \"bird\", 1);";
-	cin.rdbuf(eval_input.rdbuf());
-
-	p.evaluate_statement(db);
-
-
-
-	eval_input.clear();
-	eval_input.str(string());
-	eval_input << "SHOW animals;";
-	cin.rdbuf(eval_input.rdbuf());
-
-	p.evaluate_statement(db);
-
-	eval_input.clear();
-	eval_input.str(string());
-	eval_input << "UPDATE animals SET name = \"bingo\" WHERE kind == \"dog\" && years < 5;";
+	eval_input << "UPDATE SET name = \"bingo\" WHERE kind == \"dog\" && years < 5;";
 	cin.rdbuf(eval_input.rdbuf());
 
 	p.evaluate_statement(db);	
+	*/
 
+	/*
 	eval_input.clear();
 	eval_input.str(string());
 	eval_input << "DELETE FROM animals WHERE kind == \"cat\";";
 	cin.rdbuf(eval_input.rdbuf());
 
-	//p.evaluate_statement(db);
+	p.evaluate_statement(db);
+	*/
 
+	/*
 	eval_input.clear();
 	eval_input.str(string());
 	eval_input << "SHOW animals;";
 	cin.rdbuf(eval_input.rdbuf());
 
 	p.evaluate_statement(db);
+	*/
 
+	/*
 	eval_input.clear();
 	eval_input.str(string());
 	eval_input << "olddogs <- select (kind == \"dog\") (select (years > 5) animals);";
@@ -105,21 +86,16 @@ int main()
 
 	eval_input.clear();
 	eval_input.str(string());
-	eval_input << "SHOW olddogs;";
+	eval_input << "SHOW youngdogs;";
 	cin.rdbuf(eval_input.rdbuf());
 
 	p.evaluate_statement(db);
+	*/
 
 	eval_input.clear();
 	eval_input.str(string());
-	eval_input << "dogs <- olddogs + youngdogs;";
-	cin.rdbuf(eval_input.rdbuf());
-
-	p.evaluate_statement(db);
-
-	eval_input.clear();
-	eval_input.str(string());
-	eval_input << "SHOW dogs;";
+	eval_input << "youngpets <- select (years < 5) (cats + dogs);" <<
+		"SHOW youngpets;";
 	cin.rdbuf(eval_input.rdbuf());
 
 	p.evaluate_statement(db);
