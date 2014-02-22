@@ -286,23 +286,11 @@ table parser::expr() {
 		ts.putback(t);
 		return projection_qry();
 	}
-	else if (result == "renaming") {
-
-	}
-	else if (result == "union") {
-
-	}
-	else if (result == "difference") {
-
-	}
-	else if (result == "product") {
-
-	}
-	else if (result == "natural-join") {
-
-	}
 	else {
-		return atomic_expr();
+		for (int i = 0; i < result.size() + 2; i++) {
+			cin.unget();
+		}
+		return tables_qry();
 	}
 }
 
@@ -677,11 +665,13 @@ table parser::projection_qry() {
 	}
 }
 
-table parser::union_qry() {
+table parser::tables_qry() {
+
 	Token t = ts.get();
 	table left, right;
 	int assign_right = 0;
 	string view_name;
+	char op;
 	int keep_going = 1;
 	while (keep_going) {
 		switch (t.kind) {
@@ -693,19 +683,30 @@ table parser::union_qry() {
 			}
 			else if (assign_right == 1) {
 				right = atomic_expr();
-			}			
+			}
 			t = ts.get();
 			break;
-		case '+':
+		case '+': case '-': case '*':
+			op = t.kind;
 			right = atomic_expr();
 			t = ts.get();
 			break;
 		case ';':
-			return db_ptr->set_union(view_name, left, right);
+			switch (op) {
+			case '+':
+				return db_ptr->set_union(view_name, left, right);
+				break;
+			case '-':
+				return db_ptr->set_difference(view_name, left, right);
+				break;
+			case '*':
+				return db_ptr->set_cross_product(view_name, left, right);
+				break;
+			}
+			
 		}
 	}
 }
-
 
 //a request to perform a manipulation on a table
 
@@ -916,19 +917,13 @@ void parser::evaluate_statement(database& db){
 				}
 				else { //first token will be a table name or atomic expr
 					ts.get();
-
+				
 					//put operation_or_name back on the front of cin buffer
-					char *put_first;
-					put_first = new char[operation_or_name.size() + 1];
-					strncpy_s(put_first, operation_or_name.size()+1, operation_or_name.c_str(), operation_or_name.size());
-
-					int where_to_insert = new_view.size() + 4;
-					cin.rdbuf()->pubseekpos(where_to_insert);
-					cin.rdbuf()->sputn(put_first, sizeof(put_first));
-
-
+					for (int i = 0; i < operation_or_name.size() + 2; i++) {
+						cin.unget();
+					}
 					
-					query_view = union_qry();
+					query_view = tables_qry();
 					query_view.set_name(new_view);
 					db.add_table(query_view);
 				}

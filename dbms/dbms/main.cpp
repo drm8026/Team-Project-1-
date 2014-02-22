@@ -112,14 +112,14 @@ int main()
 
 	eval_input.clear();
 	eval_input.str(string());
-	eval_input << "uniontest <- olddogs + youngdogs;";
+	eval_input << "dogs <- olddogs + youngdogs;";
 	cin.rdbuf(eval_input.rdbuf());
 
 	p.evaluate_statement(db);
 
 	eval_input.clear();
 	eval_input.str(string());
-	eval_input << "SHOW uniontest;";
+	eval_input << "SHOW dogs;";
 	cin.rdbuf(eval_input.rdbuf());
 
 	p.evaluate_statement(db);

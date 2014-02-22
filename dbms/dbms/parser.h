@@ -53,10 +53,14 @@ public:
 	table projection_qry();
 	table attribute_qry();
 	table renaming_qry();
+	/*
 	table union_qry();
 	table difference_qry();
 	table product_qry();
 	table natural_join_qry();
+	*/
+	table tables_qry();
+
 
 	void evaluate_statement(database& db);
 
