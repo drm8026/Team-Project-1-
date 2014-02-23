@@ -88,13 +88,85 @@ class Application{
 			cin >> table1;
 			return table1;
 		}
+		string prompt_primary(){
+			string attr_list;			//full command of space delimited primary keys
+			vector<string> split_list;		//full command of primary keys in vector
+			stringstream ss;		//used for final return including braces and brackets
+			cout << "What key values would you like to use to specify unique entries? " << endl;
+			cout << "i.e. two entries cannot have the same name and age	  	" << endl;
+			getline(cin, attr_list); //delimited by spaces
+			split_list = p.split_on_spaces(attr_list);
+			
+			ss <<"PRIMARY KEY (";
+			for (int i = 0; i < split_list.size(); i++){
+				ss << prompt_type(split_list[i]);
+				if (i < split_list.size() - 1){
+					ss << ", ";
+				}
+
+			}
+			ss << ")";
+			return ss.str();
+		}
+		string prompt_type(string attr){
+			string type;			//stores users input of string or int
+			stringstream ss;		//used for final return including braces and brackets
+			int length;					//each string will have a length
+			cout << "Is " << attr << "a number or a word? enter \"number\" or \"word\" without the quotes "<< endl;
+			cout << "i.e. color is a word such as blue or green, age would be a number such as 1 or 3" << endl;
+			cin >> type;
+			if (type == "word"){
+				cout << "What is the maximum length " << attr << " can have? i.e. name can only be 8 letters long" << endl;
+				cin >> length;
+				type = "VARCHAR";
+			}
+			else if (type == "number"){
+				type = "INTEGER";
+			}
+
+			//store the attribute and the type into final return
+			ss << attr << type;
+			
+			//if its a word will have a length parameter too
+			if (type == "VARCHAR"){
+				ss << "(" << length << ")";
+			}
+			return ss.str();
+		}
+		string prompt_attributes(){
+			string attr_list;			//full command of space delimited attributes
+			vector<string> split_list;		//full command split into a vector of attributes names
+			stringstream ss;		//used for final return including braces and brackets
+			string garbage;				//inelegant fix to computer running multiple prompts at same time
+			cout << "What descriptions do you want in your collection? i.e. name age color statistics	  	" << endl;
+			getline(cin, attr_list); //delimited by spaces
+			split_list = p.split_on_spaces(attr_list);
+			
+			ss << " (";
+			for (int i = 0; i < split_list.size(); i++){
+				ss<<prompt_type(split_list[i]);
+				cin >> garbage;
+				if (i < split_list.size() - 1){
+					ss << ", ";
+				}
+
+			}
+			ss<< ")";
+			return ss.str();
+		}
 		string prompt_new_table(){
-			string table1, table2;
+			string table1;
+			stringstream ss;
+			string attributes="";
+			string garbage;
 			cout << "-------------------------------------------------------------------------------		" << endl;
 			cout << "        What is the name of the new <Fill> Collection		                         	" << endl;
 			cout << "-------------------------------------------------------------------------------		" << endl;
 			cin >> table1;
-			return table1;
+			attributes = prompt_attributes();
+			string primary = prompt_primary();
+			ss << "CREATE TABLE " << table1 << attributes << primary;
+			return ss.str();
 		}
 		string prompt_save(){
 			string table1;
@@ -125,7 +197,7 @@ class Application{
 			return table1;
 		}
 		void initialize(){
-			string parsed_name;						//used for achievement, player, and game names
+			string parsed_inst;						//used for achievement, player, and game names
 			string command;							//used to keep track of switch case
 			bool exit = false;
 
@@ -140,28 +212,29 @@ class Application{
 				
 				
 				if (command == "Add<FILL>"){
-					eval_input << prompt_add();
+					parsed_inst = prompt_add();
 				}
 				else if (command == "Remove<FILL>"){
-					eval_input << prompt_remove();
+					parsed_inst = prompt_remove();
 				}
 				else if (command == "Combine"){
-					eval_input << prompt_combine();
+					parsed_inst = prompt_combine();
 				}
 				else if (command == "Display<FILL>"){
-					eval_input << prompt_display();
+					parsed_inst = prompt_display();
 				}
 				else if (command == "New<FILL>Collection"){
-					eval_input << prompt_new_table();
+					parsed_inst = prompt_new_table();
 				}
 				else if (command == "Save<FILL>"){
-					eval_input << prompt_save();
+					parsed_inst = prompt_save();
 				}
 				else if (command == "Open<FILL>"){
-					eval_input << prompt_open();
+					parsed_inst = prompt_open();
+					
 				}
 				else if (command == "SaveAndCLose<FILL>"){
-					eval_input << prompt_close();
+					parsed_inst = prompt_close();
 				}
 				else if (command == "Help"){		//works
 					cout << "Type In The Keyword Of The Action You Would Like To Perform." << endl;
@@ -169,17 +242,17 @@ class Application{
 					continue;
 				}
 				else if (command == "Exit"){
-					eval_input << "EXIT";
+					parsed_inst = "EXIT";
 				}
 				else{
 					cout << "Type In The Keyword Of The Action You Would Like To Perform." << endl;
 					display_detailed_menu();
 					continue;
 				}
-
+				eval_input << parsed_inst;
 				cin.rdbuf(eval_input.rdbuf());
 				p.evaluate_statement(db);
-
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
 			}
 		}
 };

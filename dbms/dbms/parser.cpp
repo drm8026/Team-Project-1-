@@ -846,7 +846,9 @@ void parser::write_cmd() {
 
 	myfile << name << endl;
 
-	tble = db_ptr->get_table(name);
+	if (db_ptr->find_table(name) > -1){
+		tble = db_ptr->get_table(name);
+	}
 
 	for (int i = 0; i < tble.attribute_names.size(); i++){
 		myfile << tble.attribute_names[i] << '\t';
