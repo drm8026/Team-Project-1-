@@ -3,8 +3,8 @@
 
 class Application{
 	private:
-		database * db;
-		parser * p;
+		database * db;		//a database for storing all relations and views
+		parser * p;			//parser to read user input and pass instructions to database
 	public:
 		Application(database& _db, parser& _p) { db = &_db; p = &_p; }
 
@@ -12,10 +12,11 @@ class Application{
 		//											Display Functions
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		void print_tables();
-		void print_size();
-		void display_menu();
-		void display_detailed_menu();
+		void print_tables();				//print a list of all tables currently in databse
+		void print_size();					//testing purposes, used to show differnce in database tables size
+		void display_menu();				//prints default menu for user to read what inputs are accepted
+		void display_detailed_menu();		//in case of typo or confusion to what they do "Help" displays descriptions
+											//of all functions
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//											Helper Functions
@@ -35,162 +36,39 @@ class Application{
 			return result;
 		}
 
-		string prompt_tuple(string name);
-		string prompt_primary();
-		string prompt_type(string attr);
-		string prompt_attributes();
-		string prompt_reattributes();
+		string prompt_tuple(string name);			//prompts user on input values of a table into a specific table
+		string prompt_primary();					//prompts user on primary key by which to identify unique tuples
+		string prompt_type(string attr);			//prompts types of attribute list varchar or integer
+		string prompt_attributes();					//prompts user on name of attribute list for create table
+		string prompt_reattributes();				//prompts user on name of new attributes for rename
+		string prompt_condition(string name);		//used to prompt user on attribute list and compare using operators
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//											Query Functions
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		string prompt_select(string name);
-		string prompt_project(string name);
-		string prompt_filter();
-		string prompt_combine(){
-			string table1, table2;
-			cout << "-------------------------------------------------------------------------------		" << endl;
-			cout << "        Which <Fill> would you like to perform a combine on?                          	" << endl;
-			cout << "-------------------------------------------------------------------------------		" << endl;
-			print_tables();
-			cout << "----------Enter the first tables name-------------------------------------------		" << endl;
-			cin >> table1;
-			cout << "----------Enter the second tables name------------------------------------------		" << endl;
-			cin >> table2;
-			return "test";
-		}
-
-		string prompt_condition(string name)
-		{
-
-			vector<string> split_list;		//full command split into a vector of attributes names
-			vector<string> literals;		//strings containing &&, or, or ==, each pairing with a key specified
-			vector<string> conj;		//strings containing &&, or, or ==, each pairing with a key specified
-			string attr_list;			//full command of space delimited attributes
-			string conjugate;					//value contianing equals, not equals, greater than, or less than
-			string value;				//value to compare a attribute to
-			stringstream ss;		//used for final return including braces and brackets
-			vector <string> table_attr_list = db->get_table(name).attribute_names;
-			cout << "-------------------------------------------------------------------------------		" << endl;
-			cout << "What descriptors do you want to check against?" << endl;
-			cout << "choices:  	";
-			for (int j = 0; j < table_attr_list.size(); j++)
-			{
-				cout << table_attr_list[j]<<" ";
-			}
-
-			cout << endl;
-
-			cin.ignore(numeric_limits<streamsize>::max(), '\n');
-			getline(cin, attr_list); //delimited by spaces					//grabs whole line to split up
-			split_list = split_on_spaces(attr_list);				//now has a vector of strings
-
-
-			cout << "-------------------------------------------------------------------------------		" << endl;
-
-			for (int i = 0; i < split_list.size(); i++)
-			{
-				cout << "For " << split_list[i] << ", what value do you want to compare to?" << endl;
-				cin >> value;
-				literals.push_back(value);
-				cout << "For " << split_list[i] << ", Do want want values lower, equal to, not equal, or greater?" << endl;
-				cout << "Enter \"less\", \"equal\",\"nequal\", or \"greater\".	  	" << endl;
-				cin >> conjugate;
-				conj.push_back(conjugate);
-			}
-
-
-			ss << " (";
-			for (int i = 0; i < split_list.size(); i++)
-			{
-				ss << split_list[i];
-
-				if (conj[i] == "equal")
-				{
-					ss << "==";
-				}
-
-				else if (conj[i] == "nequal")
-				{
-					ss << "!=";
-				}
-
-				else if (conj[i] == "greater")
-				{
-					ss << ">";
-				}
-
-				else if (conj[i] == "less")
-				{
-					ss << "<";
-				}
-
-				if (isalpha(literals[i][0]))
-				{		//value is a varchar
-					literals[i] = '"' + literals[i] + '"';
-				}
-
-				ss << literals[i];
-
-				if (i < split_list.size() - 1)
-				{
-					ss << " && ";
-				}
-
-			}
-			ss << ") ";
-			return ss.str();
-		}
-		string prompt_remove()
-		{
-			string table1;
-			stringstream ss;
-
-			cout << "-------------------------------------------------------------------------------		" << endl;
-			cout << "        Which <FILL> would you like to remove from?      	" << endl;
-			cout << "-------------------------------------------------------------------------------		" << endl;
-			print_tables();
-			cout << "----------Enter the tables name------------------------------------------------" << endl;
-			cin >> table1;
-
-			string condition = prompt_condition(table1);
-			condition = condition.substr(2, condition.size() - 4);
-			ss << "DELETE FROM " << table1 << " WHERE " << condition;
-			cout << ss.str();
-			return ss.str();
-		}
-
-		string prompt_rename();
-		string prompt_update()
-		{
-			string table1;
-			stringstream ss;
-			cout << "-------------------------------------------------------------------------------		" << endl;
-			cout << "        Which <FILL> would you like to remove from?      	" << endl;
-			cout << "-------------------------------------------------------------------------------		" << endl;
-			print_tables();
-			cout << "----------Enter the tables name------------------------------------------------" << endl;
-			cin >> table1;
-			string attributes = prompt_tuple(table1);
-			ss << "REMOVE FROM " << table1 << " VALUES FROM " << attributes;
-			return ss.str();
-		}
+		string prompt_select(string name);			//prompts user on what values of attributes to select
+		string prompt_project(string name);			//prompts user on what attributs to project
+		string prompt_filter();						//prompts user on how to filter a table project or select
+		string prompt_combine();					//prompts user on how to combine two relations + - *
 		
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//											Command Functions
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		string prompt_add();
-		string prompt_new_table();
-		string prompt_save();
-		string prompt_open();
-		string prompt_close();
-		string prompt_display();
+		string prompt_remove();				//user input to compare to values, remove any that match requirements
+		string prompt_rename();				//user inputs a new attribute lists names
+		string prompt_update();				//user input to compare to values, set values that match requirements
+		string prompt_add();				//adds a new tuple to a relation from user input
+		string prompt_new_table();			//creates a new table using user input
+		string prompt_save();				//writes a table to an output file, "file.db"
+		string prompt_open();				//opens a table from a input file, "file.db"
+		string prompt_close();				//writes a table to an output file, "file.db", drops table from database
+		string prompt_display();			//displays table to screen
 		
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//									MAIN INITIALIZATION FUNCTION
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		void initialize();
+		void initialize();					//initializes menu and displays prompts based on input
 };
