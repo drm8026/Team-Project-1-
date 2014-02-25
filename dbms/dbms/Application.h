@@ -22,8 +22,7 @@ class Application{
 		//											Helper Functions
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		vector<string> split_on_spaces(string str) 
-		{
+		vector<string> split_on_spaces(string str){  //given a string divides a string into a vector and returns vector
 			istringstream iss(str);
 			string s;
 			vector<string> result;
@@ -34,7 +33,7 @@ class Application{
 			}
 
 			return result;
-		}
+		}	 
 
 		string prompt_tuple(string name);			//prompts user on input values of a table into a specific table
 		string prompt_primary();					//prompts user on primary key by which to identify unique tuples
