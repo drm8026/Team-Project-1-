@@ -10,7 +10,7 @@ private:
 
 	//stores name of table
 	string name;	
-
+	bool is_cross_product_flag;
 public:
 
 	//storage variables
@@ -24,7 +24,8 @@ public:
 		attribute_names = _attribute_names;
 		primary_key = _primary_key;
 	};
-	
+	void set_cp_flag(bool b) { is_cross_product_flag = b; }
+
 	//mutator function
 	void set_name(string _name) {
 		name = _name;

@@ -30,74 +30,41 @@ void table::insert(vector<string> _field_values)
 	{
 		e.set_attribute(attribute_names[i], _field_values[i]);
 	}
-	/*
-	primary key check is commented out because it detects duplicate entries in cross product operations
-	*/
 
-	
-	//checks entity values from entity_table against entity's values using primary key
-	bool is_duplicate = false;
-	int num_duplicate_attributes = 0;
-	for (int i = 0; i < entity_table.size(); i++) {
-		for (int j = 0; j < primary_key.size(); j++) {
-			if (entity_table[i].get_attribute(primary_key[j]) == e.get_attribute(primary_key[j])) {
-				num_duplicate_attributes++;
+	if (!is_cross_product_flag) {
+		//checks entity values from entity_table against entity's values using primary key
+		bool is_duplicate = false;
+		int num_duplicate_attributes = 0;
+		for (int i = 0; i < entity_table.size(); i++) {
+			for (int j = 0; j < primary_key.size(); j++) {
+				if (entity_table[i].get_attribute(primary_key[j]) == e.get_attribute(primary_key[j])) {
+					num_duplicate_attributes++;
+				}
+
 			}
+			if (num_duplicate_attributes == primary_key.size()) {
+				is_duplicate = true;
+				break;
+			}
+			num_duplicate_attributes = 0;
 
 		}
-		if (num_duplicate_attributes == primary_key.size()) {
-			is_duplicate = true;
-			break;
+		if (!is_duplicate) {
+			entity_table.push_back(e);
 		}
-		num_duplicate_attributes = 0;
-
-	}
-	if (!is_duplicate) {
-		entity_table.push_back(e);
+		else {
+			cout << "Duplicate entity detected. Insert FAILED." << endl;
+		}
 	}
 	else {
-		cout << "Duplicate entity detected. Insert FAILED." << endl;
-	}
-
-
-	/*
-	for (int i = 0; i < primary_key.size(); i++)
-	{
-		
-		
-		
-		
-		found.push_back(false);
-		for (int j = 0; j < entity_table.size(); j++)
-		{
-			if (e.attributes[primary_key[i]] == entity_table[j].attributes[primary_key[i]])
-			{
-				found[i] = true;
-			}
-		}
-	}
-
-	//checks if found
-	for (int k = 0; k < found.size(); k++)
-	{
-		if (found[k] == false)
-		{
-			present = false;
-		}
-	}
-	//if not found, push into table
-	if (present == false)
-	{
 		entity_table.push_back(e);
 	}
-
-	//if found, print out message
-	if (present)
-	{
-		
-	}
-	*/
 	
+
+	
+	
+
+
 }
 
 //prints table for user
