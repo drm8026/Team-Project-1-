@@ -20,7 +20,7 @@ void table::set_pri_key(vector<string> _primary_key)
 //Helper functions
 //inserts an entity into table
 void table::insert(vector<string> _field_values) 
-{
+ {
 	entity e;
 	vector<bool> found;
 	bool present = true;
@@ -30,10 +30,43 @@ void table::insert(vector<string> _field_values)
 	{
 		e.set_attribute(attribute_names[i], _field_values[i]);
 	}
+	/*
+	primary key check is commented out because it detects duplicate entries in cross product operations
+	*/
 
+	
 	//checks entity values from entity_table against entity's values using primary key
+	bool is_duplicate = false;
+	int num_duplicate_attributes = 0;
+	for (int i = 0; i < entity_table.size(); i++) {
+		for (int j = 0; j < primary_key.size(); j++) {
+			if (entity_table[i].get_attribute(primary_key[j]) == e.get_attribute(primary_key[j])) {
+				num_duplicate_attributes++;
+			}
+
+		}
+		if (num_duplicate_attributes == primary_key.size()) {
+			is_duplicate = true;
+			break;
+		}
+		num_duplicate_attributes = 0;
+
+	}
+	if (!is_duplicate) {
+		entity_table.push_back(e);
+	}
+	else {
+		cout << "Duplicate entity detected. Insert FAILED." << endl;
+	}
+
+
+	/*
 	for (int i = 0; i < primary_key.size(); i++)
 	{
+		
+		
+		
+		
 		found.push_back(false);
 		for (int j = 0; j < entity_table.size(); j++)
 		{
@@ -61,9 +94,9 @@ void table::insert(vector<string> _field_values)
 	//if found, print out message
 	if (present)
 	{
-		cout << "Duplicate entity detected. Insert FAILED." << endl;
+		
 	}
-	
+	*/
 	
 }
 
@@ -141,7 +174,7 @@ string toLower(string s)
 	return temp;
 }
 
-
+//compares operand 1 to operand 2 with an operator
 bool do_comparison(string oper1, string op, string oper2) 
 {
 	int d_oper1, d_oper2;
@@ -166,7 +199,6 @@ bool do_comparison(string oper1, string op, string oper2)
 	//less than operation case
 	if (op == "<") 
 	{
-
 		if (integer_op_flag) 
 		{
 
@@ -308,6 +340,7 @@ bool do_comparison(string oper1, string op, string oper2)
 	return false;
 }
 
+//evaluate condition to determine which entities meet the criteria, return vector containing their indices
 vector<int> table::eval_condition(condition_obj condit) 
 {
 	vector<int> condition_satisfactory_indices;
@@ -342,10 +375,10 @@ vector<int> table::eval_condition(condition_obj condit)
 			}
 			//check each previous satisfactory entity with new comparison
 		}
-
+		//sort vector and remove duplicates
 		sort(conjunction_satisfactory_indices.begin(), conjunction_satisfactory_indices.end());
 		conjunction_satisfactory_indices.erase(std::unique(conjunction_satisfactory_indices.begin(), conjunction_satisfactory_indices.end()), conjunction_satisfactory_indices.end());
-
+		//start from highest index and end with lowest
 		for (int x = conjunction_satisfactory_indices.size() - 1; x >= 0; x--) 
 		{
 			int index = conjunction_satisfactory_indices[x];

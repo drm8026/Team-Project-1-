@@ -622,7 +622,7 @@ string Application::prompt_add(){
 //											Main Initialization Function
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Application::initialize(){
-	streambuf * buf = cin.rdbuf();
+	streambuf * buf = cin.rdbuf(); //back up cin buffer in a clean state
 	string parsed_inst;						//used for achievement, player, and game names
 	string command;							//used to keep track of switch case
 	bool exit = false;
@@ -631,11 +631,11 @@ void Application::initialize(){
 		command = "test3";
 		cout << "What would you like to do=>" << endl;
 		cin.clear();
-		cin.rdbuf(buf);
+		cin.rdbuf(buf); //every loop restore cin buffer to clean state stored previously
 		cin >> command;
 		stringstream eval_input;
 		eval_input.clear();
-		eval_input.str(string());
+		eval_input.str(string()); //set eval_input's buffer to an empty string
 
 
 		if (command == "AddToZoo"){
@@ -682,8 +682,8 @@ void Application::initialize(){
 			continue;
 		}
 		parsed_inst = parsed_inst + ';';
-		eval_input << parsed_inst;
-		cin.rdbuf(eval_input.rdbuf());
+		eval_input << parsed_inst; //set eval_input to the command string to send to parser
+		cin.rdbuf(eval_input.rdbuf());  //set cin's buffer to eval_inputs buffer so parser can read the command
 		p->evaluate_statement();
 	}
 }

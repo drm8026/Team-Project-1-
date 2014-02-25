@@ -13,9 +13,9 @@ using namespace std;
 class parser {
 public:
 
-	database* db_ptr = new database();
+	database* db_ptr = new database(); //pointer to a database object
 	parser() {};
-	parser(database& db) { db_ptr = &db; }
+	parser(database& db) { db_ptr = &db; } //assign the db pointer to a passed database object
 
 	char alpha();
 	std::string identifier();
@@ -54,7 +54,7 @@ public:
 	table tables_qry();
 
 
-	void evaluate_statement();
+	void evaluate_statement(); //reads from cin to evaluate statements
 
 };
 

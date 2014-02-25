@@ -162,6 +162,16 @@ table database::set_cross_product(string view_name, table t1, table t2)
 	//defining tables
 	table cp_table;
 	
+	vector<string> new_pri_key;
+	for (int i = 0; i < t1.primary_key.size(); i++) {
+		new_pri_key.push_back(t1.primary_key.at(i));
+	}
+	for (int i = 0; i < t2.primary_key.size(); i++) {
+		new_pri_key.push_back(t2.primary_key.at(i));
+	}
+	cp_table.set_pri_key(new_pri_key);
+
+
 	//defining starting
 	vector<string> attr_names;
 	attr_names = t1.attribute_names;

@@ -289,7 +289,6 @@ condition_obj parser::condition()
 //returns a keyword (uppercase strings)
 string parser::keyword() 
 {
-
 	string id = "";
 	Token t = ts.get();
 	ts.putback(t);
@@ -419,7 +418,7 @@ int parser::type()
 		}
 	}
 }
-
+//return a type identifier 
 pair<int, int> parser::attr_type() 
 {
 	pair<int, int> pair;
@@ -428,8 +427,8 @@ pair<int, int> parser::attr_type()
 
 	switch (which_type) 
 	{
-	case 1:
-		pair.first = 1;
+	case 1: //if type is integer, pair->first is set to '1', pair->second is set to the actual integer value
+		pair.first = 1; 
 		t = ts.get();
 
 		if (t.kind == '8') 
@@ -439,7 +438,7 @@ pair<int, int> parser::attr_type()
 		ts.get();
 		break;
 
-	case 2:
+	case 2: //if type is varchar, pair->first is set to '2', pair->second is unecessary so is set to 0
 		pair.first = 2;
 		pair.second = 0;
 		ts.putback(t);
@@ -870,6 +869,7 @@ table parser::renaming_qry() {
 		}
 	}
 }
+//returns a table with only certain attribute-value pairs from some table
 table parser::projection_qry() 
 {
 	int num_of_parentheses = 0;
@@ -1003,12 +1003,9 @@ void parser::delete_cmd()
 
 void parser::exit_cmd() 
 {
-
 	cout << "You are logging out. Have a Good Day." << endl;
 
 	exit(0);
-
-
 }
 
 vector<string> parser::split_on_spaces(string str) 
@@ -1170,14 +1167,15 @@ void parser::evaluate_statement()
 			t = ts.get();
 			break;
 
-		case '<':
+		case '<': //check for query arrow ( <- )
 			t = ts.get();
 			if (t.kind == '-') 
 			{
 				operation_or_name = identifier();
+				//depending on which query is entered, direct program flow to appropriate function
 				if (operation_or_name == "select") 
 				{
-					query_view = selection_qry();
+					query_view = selection_qry(); 
 					query_view.set_name(new_view);
 					db_ptr->add_table(query_view);
 				}
@@ -1193,10 +1191,9 @@ void parser::evaluate_statement()
 					query_view.set_name(new_view);
 					db_ptr->add_table(query_view);
 				}
-				else  //first token will be a table name or atomic expr
+				else  //first token is an expression
 				{
-					ts.get();
-				
+					ts.get();				
 					//put operation_or_name back on the front of cin buffer
 					for (int i = 0; i < operation_or_name.size() + 2; i++) 
 					{
@@ -1209,7 +1206,7 @@ void parser::evaluate_statement()
 			}
 			break;
 
-		case '0':
+		case '0': //reached end of file, garbage cin input, exit loop
 			keep_going = 0;
 			break;
 
