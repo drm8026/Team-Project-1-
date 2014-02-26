@@ -31,8 +31,8 @@ void table::insert(vector<string> _field_values)
 		e.set_attribute(attribute_names[i], _field_values[i]);
 	}
 
-	if (!is_cross_product_flag) {
-		//checks entity values from entity_table against entity's values using primary key
+	if (!is_cross_product_flag) { //if table is a cross product view, skip primary key check to make sure all entities are captured
+		//checks current entity 'e' against every other entity using primary key
 		bool is_duplicate = false;
 		int num_duplicate_attributes = 0;
 		for (int i = 0; i < entity_table.size(); i++) {
@@ -40,7 +40,6 @@ void table::insert(vector<string> _field_values)
 				if (entity_table[i].get_attribute(primary_key[j]) == e.get_attribute(primary_key[j])) {
 					num_duplicate_attributes++;
 				}
-
 			}
 			if (num_duplicate_attributes == primary_key.size()) {
 				is_duplicate = true;
@@ -59,12 +58,6 @@ void table::insert(vector<string> _field_values)
 	else {
 		entity_table.push_back(e);
 	}
-	
-
-	
-	
-
-
 }
 
 //prints table for user

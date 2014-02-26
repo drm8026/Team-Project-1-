@@ -10,7 +10,7 @@ private:
 
 	//stores name of table
 	string name;	
-	bool is_cross_product_flag;
+	bool is_cross_product_flag; //flag set to true if table is a cross product view
 public:
 
 	//storage variables

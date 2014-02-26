@@ -1,3 +1,6 @@
+#ifndef APPLICATION_H
+#define APPLICATION_H
+
 #include "parser.h"
 #include <cctype>
 
@@ -71,3 +74,5 @@ class Application{
 		
 		void initialize();					//initializes menu and displays prompts based on input
 };
+
+#endif
