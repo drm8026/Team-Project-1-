@@ -65,7 +65,6 @@ table database::set_difference(string view_name, table t1, table t2)
 	}
 
 	diff_table.set_name(view_name);
-	cout<<diff_table.entity_table.size();
 	return diff_table;
 }
 

@@ -39,6 +39,8 @@ public:
 			if(tables[i].get_name()==table_name)
 				return i;
 		}
+		string err = table_name + "Table not found!";
+		throw "Table not found!";
 		return -1;
 	}
 

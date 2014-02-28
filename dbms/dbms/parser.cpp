@@ -932,8 +932,27 @@ table parser::projection_qry()
 			break;
 
 		case ';':
-			return db_ptr->set_projection(view_name, to_return, attr_list);
-			keep_going = 0;
+			bool good_attribute = false;
+			for (int i = 0; i < attr_list.size(); i++) {
+				for (int j = 0; j < to_return.attribute_names.size(); j++) {
+					if (attr_list[i] == to_return.attribute_names[j]) {
+						good_attribute = true;
+						break;
+					}
+				}
+				if (good_attribute) {
+					break;
+				}				
+			}
+			if (good_attribute) {
+				return db_ptr->set_projection(view_name, to_return, attr_list);
+				keep_going = 0;
+			}
+			else {
+				throw "No such attribute!";
+			}
+			
+			
 		}
 	}
 }
@@ -1130,112 +1149,125 @@ void parser::evaluate_statement()
 	string key_word;
 	string new_view;
 	string operation_or_name;
-
-	while (keep_going) 
+	while (keep_going)
 	{
-		switch (t.kind) 
-		{
-		case '7':
-			ts.putback(t);
-			key_word = keyword();
-			if (key_word == "SHOW") 
+		try {
+			switch (t.kind)
 			{
-				db_ptr->get_table(show_cmd()).display_table();
-				t = ts.get();
-			}
-			else if (key_word == "DELETEFROM") 
-			{
-				delete_cmd();
-				t = ts.get();
-			}
-			else if (key_word == "CREATETABLE") 
-			{
-				db_ptr->add_table(create_cmd());
-				t = ts.get();
-			}
-			else if (key_word == "EXIT") 
-			{
-				exit_cmd();
-			}
-			else if (key_word == "CLOSE") 
-			{
-				db_ptr->delete_table(db_ptr->get_table(close_cmd())); 
-				t = ts.get();
-			}
-			else if (key_word == "UPDATE") 
-			{
-				update_cmd();			
-				t = ts.get();				
-			}
-			else if (key_word == "WRITE") 
-			{
-				write_cmd();
-				t = ts.get();
-			}
-			else if (key_word == "OPEN") 
-			{
-				open_cmd();
-				t = ts.get();
-			}
-			else if (key_word == "INSERTINTO") 
-			{
-				insert_cmd();
-				t = ts.get();
-			}
-			break;
+			case '7':
+				ts.putback(t);
+				key_word = keyword();
+				if (key_word == "SHOW")
+				{
+					db_ptr->get_table(show_cmd()).display_table();
+					t = ts.get();
+				}
+				else if (key_word == "DELETEFROM")
+				{
+					delete_cmd();
+					t = ts.get();
+				}
+				else if (key_word == "CREATETABLE")
+				{
+					db_ptr->add_table(create_cmd());
+					t = ts.get();
+				}
+				else if (key_word == "EXIT")
+				{
+					exit_cmd();
+				}
+				else if (key_word == "CLOSE")
+				{
+					db_ptr->delete_table(db_ptr->get_table(close_cmd()));
+					t = ts.get();
+				}
+				else if (key_word == "UPDATE")
+				{
+					update_cmd();
+					t = ts.get();
+				}
+				else if (key_word == "WRITE")
+				{
+					write_cmd();
+					t = ts.get();
+				}
+				else if (key_word == "OPEN")
+				{
+					open_cmd();
+					t = ts.get();
+				}
+				else if (key_word == "INSERTINTO")
+				{
+					insert_cmd();
+					t = ts.get();
+				}
+				break;
 
-		case '9':
-			ts.putback(t);
-			new_view = relation_name();
-			t = ts.get();
-			break;
+			case '9':
+				ts.putback(t);
+				new_view = relation_name();
+				t = ts.get();
+				break;
 
-		case '<': //check for query arrow ( <- )
-			t = ts.get();
-			if (t.kind == '-') 
-			{
-				operation_or_name = identifier();
-				//depending on which query is entered, direct program flow to appropriate function
-				if (operation_or_name == "select") 
+			case '<': //check for query arrow ( <- )
+				t = ts.get();
+				if (t.kind == '-')
 				{
-					query_view = selection_qry(); 
-					query_view.set_name(new_view);
-					db_ptr->add_table(query_view);
-				}
-				else if (operation_or_name == "project") 
-				{
-					query_view = projection_qry();
-					query_view.set_name(new_view);
-					db_ptr->add_table(query_view);
-				}
-				else if (operation_or_name == "rename") 
-				{
-					query_view = renaming_qry();
-					query_view.set_name(new_view);
-					db_ptr->add_table(query_view);
-				}
-				else  //first token is an expression
-				{
-					ts.get();				
-					//put operation_or_name back on the front of cin buffer
-					for (int i = 0; i < operation_or_name.size() + 2; i++) 
+					operation_or_name = identifier();
+					//depending on which query is entered, direct program flow to appropriate function
+					if (operation_or_name == "select")
 					{
-						ss_ptr->unget();
-					}					
-					query_view = tables_qry();
-					query_view.set_name(new_view);
-					db_ptr->add_table(query_view);
+						query_view = selection_qry();
+						query_view.set_name(new_view);
+						db_ptr->add_table(query_view);
+					}
+					else if (operation_or_name == "project")
+					{
+						query_view = projection_qry();
+						query_view.set_name(new_view);
+						db_ptr->add_table(query_view);
+					}
+					else if (operation_or_name == "rename")
+					{
+						query_view = renaming_qry();
+						query_view.set_name(new_view);
+						db_ptr->add_table(query_view);
+					}
+					else  //first token is an expression
+					{
+						ts.get();
+						//put operation_or_name back on the front of cin buffer
+						for (int i = 0; i < operation_or_name.size() + 2; i++)
+						{
+							ss_ptr->unget();
+						}
+						query_view = tables_qry();
+						query_view.set_name(new_view);
+						db_ptr->add_table(query_view);
+					}
 				}
+				break;
+
+			case '0': //reached end of file, garbage cin input, exit loop
+				keep_going = 0;
+				break;
+
+			default:
+				t = ts.get();
+				break;
 			}
-			break;
 
-		case '0': //reached end of file, garbage cin input, exit loop
-			keep_going = 0;
-			break;
 
-		default:
-			t = ts.get();
-			break;
 		}
-	}			
+		catch (const char* err) {
+			cerr << err << '\n' << endl;
+			t = ts.get();
+			ts.putback(t);
+			//ss_ptr->ignore(256, ';');
+		}
+		
+	}
+	
+	
+
 }
