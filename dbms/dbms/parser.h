@@ -2,20 +2,24 @@
 #define PARSER_H
 
 #include "database.h"
-#include "tokenizer.h"
-#include <string>
-#include "table.h"
+#include "token_stream.h"
 #include "typed_attribute.h"
-#include <sstream>
-#include <istream>
+#include <string>
 
 using namespace std;
 class parser {
 public:
 
 	database* db_ptr = new database(); //pointer to a database object
+	stringstream * ss_ptr;
+	
 	parser() {};
 	parser(database& db) { db_ptr = &db; } //assign the db pointer to a passed database object
+
+	void set_ss_ptr(stringstream &ss) {
+		ss_ptr = &ss;
+		ts = Token_stream(*ss_ptr);
+	}
 
 	char alpha();
 	std::string identifier();
@@ -55,7 +59,7 @@ public:
 
 
 	void evaluate_statement(); //reads from cin to evaluate statements
-
+	Token_stream ts;
 };
 
 #endif

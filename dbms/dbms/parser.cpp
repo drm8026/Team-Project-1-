@@ -4,7 +4,7 @@
 
 using namespace std;
 
-Token_stream ts;
+
 
 //function returns a letter (checks if uppercase or lowercase)
 char parser::alpha() 
@@ -72,6 +72,7 @@ string parser::identifier() {
 				ts.putback(t);
 			}			
 			break;
+		
 
 		case '8': //keep integers in identifier
 			id += to_string(t.value);
@@ -80,7 +81,7 @@ string parser::identifier() {
 			ts.putback(t);
 			break;
 
-		case '_': //keep underscores in identifier
+		case '_': case '!': case '/': //keep other characters in identifier
 			id += t.kind;
 			ts.get();
 			t = ts.get();
@@ -258,6 +259,9 @@ condition_obj parser::condition()
 	{
 		switch (t.kind) 
 		{
+		case '(':
+			t = ts.get();
+			break;
 		case '9':
 			ts.putback(t);
 			condit.conjunctions.push_back(conjunction());
@@ -387,7 +391,7 @@ table parser::expr()
 	{
 		for (int i = 0; i < result.size() + 2; i++)  //if not select/project/rename, put back characters on cin so they can be read
 		{	
-			cin.unget();
+			ss_ptr->unget();
 		}
 
 		return tables_qry();
@@ -528,6 +532,8 @@ vector<string> parser::literal_list()
 {
 	vector<string> list;
 	string id;
+	int neg_number = 1;
+	int num;
 	Token t = ts.get();
 	while (1) 
 	{
@@ -543,9 +549,15 @@ vector<string> parser::literal_list()
 		case ',':
 			t = ts.get();
 			break;
-
+		
+		case '-':
+			neg_number = -1;
+			t = ts.get();
+			break;
 		case '8':
-			list.push_back(to_string(t.value));
+			num = neg_number * t.value;
+			neg_number = 1;
+			list.push_back(to_string(num));
 			t = ts.get();
 			break;
 
@@ -559,7 +571,8 @@ void parser::insert_cmd()
 {
 	Token t = ts.get();
 	string name;
-	vector<string> literals;
+	vector<vector<string>> literals_vec;
+	
 	int keep_going = 1;
 
 	while (keep_going) 
@@ -574,17 +587,28 @@ void parser::insert_cmd()
 
 		case '7':
 			ts.putback(t);
-			if (keyword() == "VALUESFROM") 
+			string key_word = keyword();
+			if (key_word == "VALUESFROM")
 			{
 				t = ts.get();
-				literals = literal_list();
+				literals_vec.push_back(literal_list());
+			}
+			else if (key_word == "VALUESFROMRELATION") {
+				t = ts.get();
+
+				table insert_rel = expr();
+				for (int i = 0; i < insert_rel.entity_table.size(); i++) {
+					literals_vec.push_back(insert_rel.entity_table[i].get_attr_values());
+				}
 			}
 			keep_going = 0;
 			break;
 		}
 	}
-
-	db_ptr->get_table(name).insert(literals);
+	for (int i = 0; i < literals_vec.size(); i++) {
+		db_ptr->get_table(name).insert(literals_vec[i]);
+	}
+	
 }
 //update entities that meet some condition with set values
 void parser::update_cmd() 
@@ -691,7 +715,6 @@ table parser::create_cmd()
 		}
 	}
 	table temp(name, ta_list.list, primary_key_list);
-	cout << "table created succesfully" << endl;
 	return temp;
 }
 
@@ -1197,7 +1220,7 @@ void parser::evaluate_statement()
 					//put operation_or_name back on the front of cin buffer
 					for (int i = 0; i < operation_or_name.size() + 2; i++) 
 					{
-						cin.unget();
+						ss_ptr->unget();
 					}					
 					query_view = tables_qry();
 					query_view.set_name(new_view);

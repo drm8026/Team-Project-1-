@@ -21,6 +21,8 @@ struct entity {
 	
 	//accessor function
 	string get_attribute(string _attribute_name);
+
+	vector<string> get_attr_values();
 	
 	//mutation function
 	void set_attribute(string _field_name, string _field_value);

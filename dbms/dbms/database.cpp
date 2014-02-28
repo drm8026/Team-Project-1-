@@ -64,25 +64,6 @@ table database::set_difference(string view_name, table t1, table t2)
 		check=0;
 	}
 
-	//finding reverse difference between both tables
-	for (int i = 0; i < t2.entity_table.size(); i++) 
-	{
-		for (int j = 0; j < t1.entity_table.size(); j++) 
-		{
-			if (!(t2.entity_table[i] == t1.entity_table[j])) 
-			{
-				check++;
-			}
-		}
-
-		//push only if didnt find this element
-		if(check==t1.entity_table.size()) 
-		{
-			diff_table.entity_table.push_back(t2.entity_table[i]);
-		}
-		check=0;
-	}
-
 	diff_table.set_name(view_name);
 	cout<<diff_table.entity_table.size();
 	return diff_table;
@@ -136,21 +117,23 @@ table database::set_projection(string view_name, table tble, vector<string> attr
 //: rename the attributes in a relation.
 table database::set_renaming(string view_name, table tble, vector<string> attributes)	
 {
-	table ren_table(view_name, attributes, tble.primary_key);
 
-	for (int i = 0; i < ren_table.entity_table.size(); i++)
-	{
-		for (int j = 0; j < ren_table.attribute_names.size(); j++)
-		{
-			ren_table.entity_table[i].set_attribute(attributes[j], ren_table.entity_table[i].get_attribute(ren_table.attribute_names[j]));
-		}
-	}
-	
-	//go through all attributes
+
+	table ren_table(view_name, attributes);
 	for (int i = 0; i < ren_table.attribute_names.size(); i++)
-	{		
+	{
 		ren_table.attribute_names[i] = attributes[i];
 	}
+
+	for (int i = 0; i < tble.entity_table.size(); i++) {
+		vector<string> f_vals;
+		f_vals = tble.entity_table[i].get_attr_values();		
+		ren_table.insert(f_vals);
+	}
+
+	
+	//go through all attributes
+
 
 	ren_table.set_name(view_name);
 	return ren_table;

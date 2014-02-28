@@ -31,7 +31,7 @@ void table::insert(vector<string> _field_values)
 		e.set_attribute(attribute_names[i], _field_values[i]);
 	}
 
-	if (!is_cross_product_flag) { //if table is a cross product view, skip primary key check to make sure all entities are captured
+	if (!is_cross_product_flag && primary_key.size() > 0) { //if table is a cross product view, skip primary key check to make sure all entities are captured
 		//checks current entity 'e' against every other entity using primary key
 		bool is_duplicate = false;
 		int num_duplicate_attributes = 0;
@@ -63,7 +63,11 @@ void table::insert(vector<string> _field_values)
 //prints table for user
 void table::display_table() 
 {
-	cout << name << endl;
+	string upperName = "";
+	for (int i = 0; i < name.size(); i++) {
+		upperName += toupper(name.at(i));
+	}
+	cout << upperName << endl;
 
 	//print out attribute names
 	for(int i = 0; i < attribute_names.size(); i++)
@@ -106,7 +110,7 @@ void table::update(vector<pair<string, string>> _set_argument, condition_obj con
 	for (int i = 0; i < indices_to_update.size(); i++) {
 		int index = indices_to_update[i];
 		for (int j = 0; j < _set_argument.size(); j++) {
-			entity_table[index].set_attribute(_set_argument[0].first, _set_argument[0].second);
+			entity_table[index].set_attribute(_set_argument[j].first, _set_argument[j].second);
 		}
 	}
 }

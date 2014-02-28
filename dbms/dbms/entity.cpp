@@ -17,6 +17,16 @@ void entity::show_attributes(vector<string> _ordering) {
 	}	
 }
 
+vector<string> entity::get_attr_values() {
+	vector<string> vals;
+
+	for (map<string, string>::iterator it = attributes.begin(); it != attributes.end(); it++) {
+		vals.push_back(it->second);
+	}
+	return vals;
+}
+
+
 //returns the value stored at a column title
 string entity::get_attribute(string _attribute_name) {
 	for (map<string, string>::iterator it = attributes.begin(); it != attributes.end(); it++){ 

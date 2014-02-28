@@ -3,7 +3,6 @@
 
 #include "entity.h"
 #include "condition_obj.h"
-#include <vector>
 
 class table {
 private:
@@ -23,6 +22,10 @@ public:
 		name = _name;
 		attribute_names = _attribute_names;
 		primary_key = _primary_key;
+	};
+	table(string _name, vector<string> _attribute_names){
+		name = _name;
+		attribute_names = _attribute_names;
 	};
 	void set_cp_flag(bool b) { is_cross_product_flag = b; }
 

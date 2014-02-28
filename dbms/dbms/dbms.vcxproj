@@ -16,7 +16,7 @@
     <ClCompile Include="entity.cpp" />
     <ClCompile Include="parser.cpp" />
     <ClCompile Include="table.cpp" />
-    <ClCompile Include="tokenizer.cpp" />
+    <ClCompile Include="token_stream.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -27,7 +27,8 @@
     <ClInclude Include="entity.h" />
     <ClInclude Include="parser.h" />
     <ClInclude Include="table.h" />
-    <ClInclude Include="tokenizer.h" />
+    <ClInclude Include="token.h" />
+    <ClInclude Include="token_stream.h" />
     <ClInclude Include="typed_attribute.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -43,7 +44,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -81,7 +82,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>

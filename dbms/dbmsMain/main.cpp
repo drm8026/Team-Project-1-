@@ -1,18 +1,30 @@
 #include "database.h"
 #include "parser.h"
-#include "tokenizer.h"
 #include "Application.h"
 #include <iostream>
 #include <sstream>
+#include <fstream>
 using namespace std;
 
-int main()
-{
+int main() {
+
+
 	database db;
 	parser p(db);
 
-	Application A(db, p);
-	A.initialize();
+	ifstream ifs("input.txt", ifstream::in);
+	stringstream ss;
+	string line;
+	while (getline(ifs, line)) {
+		ss << line << '\n';
+	}
+
+	p.set_ss_ptr(ss);
+	p.evaluate_statement();
+
+
+	//Application A(db, p);
+	//A.initialize();
 
 	
 	system("pause");

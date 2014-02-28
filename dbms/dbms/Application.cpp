@@ -18,17 +18,17 @@ void Application::display_menu(){
 	cout << "-------------------------------------------------------------------------------		" << endl;
 	cout << "                                    Commands and Queries                              	" << endl;
 	cout << "-------------------------------------------------------------------------------		" << endl;
-	cout << "                                         AddToZoo                      				" << endl;
-	cout << "                                       RemoveFromZoo									" << endl;
-	cout << "                                       CombineZoos										" << endl;
-	cout << "                                        DisplayZoo										" << endl;
-	cout << "                                          NewZoo                  						" << endl;
-	cout << "                                         SaveZoo										" << endl;
-	cout << "                                         OpenZoo               						" << endl;
-	cout << "                                      SaveAndCloseZoo									" << endl;
+	cout << "                                         Add                    				" << endl;
+	cout << "                                       Remove									" << endl;
+	cout << "                                       Combine									" << endl;
+	cout << "                                        Display									" << endl;
+	cout << "                                          New                 						" << endl;
+	cout << "                                         Save										" << endl;
+	cout << "                                         Open             						" << endl;
+	cout << "                                      SaveAndClose								" << endl;
 	cout << "                                      Help(For testing)								" << endl;
-	cout << "                                         RenameZoo										" << endl;
-	cout << "                                         FilterZoo										" << endl;
+	cout << "                                         Rename									" << endl;
+	cout << "                                         Filter									" << endl;
 	cout << "                                     Exit(To terminate)								" << endl;
 	cout << "-------------------------------------------------------------------------------		" << endl;
 }
@@ -507,7 +507,7 @@ string Application::prompt_update()
 	stringstream ss;
 	
 	cout << "-------------------------------------------------------------------------------		" << endl;
-	cout << "        Which Zoo would you like to remove from?      	" << endl;
+	cout << "        Which Zoo would you like to update?      	" << endl;
 	cout << "-------------------------------------------------------------------------------		" << endl;
 	print_tables();
 	
@@ -515,9 +515,42 @@ string Application::prompt_update()
 	cin >> table1;
 	
 	//needs to prompt user on full values of tuple and saves into a string (in, this, format)
-	string attributes = prompt_tuple(table1);
-	
-	ss << "REMOVE FROM " << table1 << " VALUES FROM " << attributes;
+	string condition = prompt_condition(table1);
+	condition = condition.substr(2, condition.size() - 4);
+	int more = 1;
+	string attr;
+	string val;
+	ss << "UPDATE " << table1 << " SET ";
+	while (more) {
+		cout << "Which attribute do you want to update? " << endl;
+		for (int i = 0; i < db->get_table(table1).attribute_names.size(); i++){				//print out the attribute list
+			cout << db->get_table(table1).attribute_names[i] << " ";
+		}
+		cout << endl;
+		cin >> attr;
+		ss << attr << " = ";
+		cout << "What new value do you want " << attr << " to have?" << endl;
+		cin >> val;
+		if (isdigit(val.at(0))) {
+			ss << val;
+		}
+		else {
+			ss << '"' << val << '"';
+		}
+		cout << "Update more? (y/n)" << endl;
+		char choice;
+		cin >> choice;
+		switch (choice) {
+		case 'y':
+			more = 1;
+			ss << ", ";
+			break;
+		case 'n':
+			more = 0; 
+			break;
+		}
+	}
+	ss << " WHERE " << condition;
 	return ss.str();
 }
 string Application::prompt_remove()
@@ -628,7 +661,6 @@ void Application::initialize(){
 	bool exit = false;
 	display_menu();
 	while (1){
-		command = "test3";
 		cout << "What would you like to do=>" << endl;
 		cin.clear();
 		cin.rdbuf(buf); //every loop restore cin buffer to clean state stored previously
@@ -636,44 +668,46 @@ void Application::initialize(){
 		stringstream eval_input;
 		eval_input.clear();
 		eval_input.str(string()); //set eval_input's buffer to an empty string
-
-
-		if (command == "AddToZoo"){
+		
+		if (command == "add"){
 			parsed_inst = prompt_add();
 		}
-		else if (command == "RemoveFromZoo"){
+		else if (command == "remove"){
 			parsed_inst = prompt_remove();
 		}
-		else if (command == "CombineZoos"){
+		else if (command == "combine"){
 			parsed_inst = prompt_combine();
 		}
-		else if (command == "DisplayZoo"){
+		else if (command == "display"){
 			parsed_inst = prompt_display();
 		}
-		else if (command == "NewZoo"){
+		else if (command == "new"){
 			parsed_inst = prompt_new_table();
 		}
-		else if (command == "SaveZoo"){
+		else if (command == "update"){
+			parsed_inst = prompt_update();
+		}
+		else if (command == "save"){
 			parsed_inst = prompt_save();
 		}
-		else if (command == "OpenZoo"){
+		else if (command == "open"){
 			parsed_inst = prompt_open();
 		}
-		else if (command == "SaveAndCloseZoo"){
+		else if (command == "saveandclose"){
 			parsed_inst = prompt_close();
 		}
-		else if (command == "FilterZoo"){
+		else if (command == "filter"){
 			parsed_inst = prompt_filter();
 		}
-		else if (command == "Help"){
+		else if (command == "help"){
 			cout << "Type In The Keyword Of The Action You Would Like To Perform." << endl;
 			display_detailed_menu();
 			continue;
 		}
-		else if (command == "RenameZoo"){
+		else if (command == "rename"){
 			parsed_inst = prompt_rename();
 		}
-		else if (command == "Exit"){
+		else if (command == "exit"){
 			parsed_inst = "EXIT";
 		}
 		else{
@@ -683,7 +717,7 @@ void Application::initialize(){
 		}
 		parsed_inst = parsed_inst + ';';
 		eval_input << parsed_inst; //set eval_input to the command string to send to parser
-		cin.rdbuf(eval_input.rdbuf());  //set cin's buffer to eval_inputs buffer so parser can read the command
+		p->set_ss_ptr(eval_input);  //set cin's buffer to eval_inputs buffer so parser can read the command
 		p->evaluate_statement();
 	}
 }
