@@ -3,6 +3,7 @@
 
 #include "entity.h"
 #include "condition_obj.h"
+#include <iomanip>
 
 
 class table {

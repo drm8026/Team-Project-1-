@@ -68,19 +68,27 @@ void table::display_table()
 		upperName += toupper(name.at(i));
 	}
 	cout << upperName << endl;
+	int max_length = 0;
+	for (int i = 0; i < entity_table.size(); i++) {
+		max_length = max(entity_table[i].max_attr_length(), max_length);
+	}
+	for (int i = 0; i < attribute_names.size(); i++) {
+		max_length = max((int)attribute_names[i].size(), max_length);
+	}
 
 	//print out attribute names
+	
 	for(int i = 0; i < attribute_names.size(); i++)
 	{
-		cout << attribute_names[i] << '\t';
+		cout << left << setw(max_length+2) << setfill(' ') << attribute_names[i];
 	}
 	
-	cout << endl;
+	cout << '\n' << setw((max_length+2)*attribute_names.size()) << setfill('-') << '-' << endl;
 	
 	//print out field values
 	for(int i = 0; i < entity_table.size(); i++)
 	{		
-		entity_table[i].show_attributes(attribute_names);
+		entity_table[i].show_attributes(attribute_names, max_length);
 		cout << endl;
 	}
 

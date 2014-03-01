@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <iomanip>
 using namespace std;
 
 struct entity {
@@ -17,11 +18,12 @@ struct entity {
 	void add_column(string _field_name, string _field_value);
 	
 	//print function
-	void show_attributes(vector<string> _ordering);
+	void show_attributes(vector<string> _ordering, int max_length);
 	
 	//accessor function
 	string get_attribute(string _attribute_name);
 
+	int max_attr_length();
 	vector<string> get_attr_values();
 	
 	//mutation function
