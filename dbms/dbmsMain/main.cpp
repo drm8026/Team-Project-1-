@@ -1,6 +1,6 @@
-#include "database.h"
 #include "parser.h"
 #include "Application.h"
+
 #include <iostream>
 #include <sstream>
 #include <fstream>

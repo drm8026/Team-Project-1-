@@ -1,6 +1,9 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 #include "table.h"
+#include "myexception.h"
+
+
 
 class database{
 
@@ -39,8 +42,8 @@ public:
 			if(tables[i].get_name()==table_name)
 				return i;
 		}
-		string err = table_name + "Table not found!";
-		throw "Table not found!";
+		string err = "Table: \"" + table_name + "\" does not exist!";
+		throw myexception(err);
 		return -1;
 	}
 

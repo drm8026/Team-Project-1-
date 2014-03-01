@@ -4,6 +4,7 @@
 #include "entity.h"
 #include "condition_obj.h"
 
+
 class table {
 private:
 

@@ -933,23 +933,35 @@ table parser::projection_qry()
 
 		case ';':
 			bool good_attribute = false;
+			vector<int> bad_attrs;
 			for (int i = 0; i < attr_list.size(); i++) {
 				for (int j = 0; j < to_return.attribute_names.size(); j++) {
 					if (attr_list[i] == to_return.attribute_names[j]) {
 						good_attribute = true;
 						break;
 					}
+
 				}
 				if (good_attribute) {
 					break;
-				}				
+				}
+				else {
+					bad_attrs.push_back(i);
+				}
 			}
 			if (good_attribute) {
 				return db_ptr->set_projection(view_name, to_return, attr_list);
 				keep_going = 0;
 			}
 			else {
-				throw "No such attribute!";
+				string err = "Attributes: ";
+				for (int i = 0; i < bad_attrs.size(); i++) {
+					err += '"';
+					err += attr_list[bad_attrs[i]];
+					err += "\" ";
+				}
+				err += "do not exist!";
+				throw myexception(err);
 			}
 			
 			
@@ -1256,14 +1268,11 @@ void parser::evaluate_statement()
 				t = ts.get();
 				break;
 			}
-
-
 		}
-		catch (const char* err) {
-			cerr << err << '\n' << endl;
+		catch (exception& e) {
+			cerr << e.what() << '\n' << endl;
 			t = ts.get();
 			ts.putback(t);
-			//ss_ptr->ignore(256, ';');
 		}
 		
 	}

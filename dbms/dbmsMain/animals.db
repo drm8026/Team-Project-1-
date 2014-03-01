@@ -1,8 +1,8 @@
 animals
-name color age
-name color
-cat blue 5
-cat orange 4
-dog black 3
-dog yellow 2
-bird yellow 1
+name kind years 
+name kind 
+Joe cat 4 
+Spot dog 10 
+Snoopy dog 3 
+Tweety bird 1 
+Joe bird 2 

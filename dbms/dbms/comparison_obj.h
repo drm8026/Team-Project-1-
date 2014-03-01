@@ -20,4 +20,4 @@ inline bool comparison_obj::operator == (const comparison_obj& c){
 		return false;
 	}
 }
-#endif // !COMPARISON_OBJ_H
+#endif

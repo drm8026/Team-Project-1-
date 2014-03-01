@@ -25,4 +25,4 @@ inline bool conjunction_obj::operator == (const conjunction_obj& c) {	//overload
 	return is_equal;
 }
 
-#endif // !CONJUNCTION_OBJ_H
+#endif
