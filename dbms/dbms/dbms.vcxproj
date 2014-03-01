@@ -25,6 +25,7 @@
     <ClInclude Include="conjunction_obj.h" />
     <ClInclude Include="database.h" />
     <ClInclude Include="entity.h" />
+    <ClInclude Include="myexception.h" />
     <ClInclude Include="parser.h" />
     <ClInclude Include="table.h" />
     <ClInclude Include="token.h" />
