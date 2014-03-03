@@ -12,8 +12,6 @@ public:
 	{
 		return message.c_str();
 	}
-
-
 };
 
 inline myexception::myexception(const std::string& msg) : message(msg) {}

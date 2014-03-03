@@ -940,7 +940,6 @@ table parser::projection_qry()
 						good_attribute = true;
 						break;
 					}
-
 				}
 				if (good_attribute) {
 					break;
@@ -954,17 +953,23 @@ table parser::projection_qry()
 				keep_going = 0;
 			}
 			else {
-				string err = "Attributes: ";
+				string err = "Attribute(s): ";
 				for (int i = 0; i < bad_attrs.size(); i++) {
-					err += '"';
-					err += attr_list[bad_attrs[i]];
-					err += "\" ";
+					if (bad_attrs.size() > 1) {
+						if (i == bad_attrs.size() - 1) {
+							err += "and \"" + attr_list[bad_attrs[i]] + "\" ";
+						}
+						else {
+							err += '"' +  + "\", ";
+						}
+						err += "do not exist!";
+					}
+					else {
+						err += '\"' + attr_list[bad_attrs[i]] + "\" does not exist!";
+					}
 				}
-				err += "do not exist!";
 				throw myexception(err);
-			}
-			
-			
+			}			
 		}
 	}
 }
